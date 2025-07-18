@@ -97,12 +97,6 @@ You can modify the backend URL in `FileUploader.jsx` if needed:
 const res = await axios.post("http://localhost:5000/api/process", formData);
 ```
 
-To deploy both frontend and backend, use:
-
-* Netlify (for this React app)
-* Render / Railway (for the backend)
-
-
 ---
 
 ## File Upload Support
