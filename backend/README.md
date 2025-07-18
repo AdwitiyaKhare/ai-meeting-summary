@@ -1,5 +1,3 @@
----
-
 ```markdown
 # AI Meeting Summary Generator – Backend
 
