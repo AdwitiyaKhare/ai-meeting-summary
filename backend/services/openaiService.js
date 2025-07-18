@@ -37,9 +37,9 @@ import axios from "axios";
 // }
 
 /**
- * 🚫 GPT-4 is not accessible without a paid OpenAI plan.
- * ✅ This version uses Hugging Face's `facebook/bart-large-cnn` for free summarization.
- * ⚠️ It only returns a summary (no objections/resolutions/etc.)
+ * GPT-4 is not accessible without a paid OpenAI plan.
+ * This version uses Hugging Face's `facebook/bart-large-cnn` for free summarization.
+ * It only returns a summary (no objections/resolutions/etc.)
  */
 
 export async function processWithOpenAI(transcript) {

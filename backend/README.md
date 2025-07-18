@@ -1,189 +1,157 @@
 ---
 
 ```markdown
-# 🧠 AI Meeting Summary & CRM Note Generator (Backend)
+# AI Meeting Summary Generator – Backend
 
-This backend service supports a full-stack AI tool to help sales, customer success, and operations teams summarize client meetings and extract actionable insights. It receives meeting transcripts (currently `.txt` files) and uses **OpenAI GPT-4** to generate:
+This is the backend service for an AI-powered tool that summarizes business meeting transcripts or audio recordings. It supports `.txt`, `.mp3`, `.wav`, and `.m4a` file uploads. The backend uses:
 
-- A summary of the meeting  
-- Client objections  
-- Team resolutions  
-- Action items and follow-ups
-
----
-
-## 🚀 Features
-
-✅ Upload `.txt` meeting transcript files  
-✅ Use GPT-4 to generate structured summaries  
-✅ Simple POST API for frontend integration  
-✅ Organized codebase with modular services  
-✅ Ready to extend for Whisper (audio), email, CRM integration
+- OpenAI Whisper for audio transcription
+- Hugging Face's `bart-large-cnn-samsum` model for summarization
+- Express.js for API handling
+- Multer for file uploads
 
 ---
 
-## 🛠 Tech Stack
+## Features
 
-| Component   | Tech Stack Used    |
-|-------------|--------------------|
-| Runtime     | Node.js (Express)  |
-| AI Engine   | OpenAI GPT-4       |
-| File Upload | Multer             |
-| Env Config  | dotenv             |
-| HTTP Client | axios              |
+- Upload text or audio files via API
+- Transcribe audio using OpenAI Whisper
+- Generate summaries using Hugging Face’s free summarization model
+- Graceful fallback when structured CRM insights aren't supported
+- Fully modular code structure (controllers, routes, services)
 
 ---
 
-## 📁 Folder Structure
+## Project Structure
 
 ```
 
 backend/
-├── app.js                    # Main Express app
+├── app.js                   # Entry point
 ├── routes/
-│   └── api.js                # API route: /api/process
+│   └── api.js               # Defines API route `/api/process`
 ├── controllers/
-│   └── aiController.js       # File handling and LLM processing
+│   └── aiController.js      # Handles file processing and response
 ├── services/
-│   ├── openaiService.js      # GPT-4 logic
-│   └── whisperService.js     # (Optional) Whisper support
-├── utils/
-│   └── fileHandler.js        # File reading and helpers
-├── uploads/                  # Temporary file uploads
-├── config/
-│   └── env.js                # .env loader
-├── .env.example              # Sample environment config
-└── README.md                 # Project info
+│   ├── whisperService.js    # Uses OpenAI Whisper for audio transcription
+│   └── openaiService.js     # Uses Hugging Face or GPT-4 for summarization
+├── uploads/                 # Temporary file uploads (auto-created)
+├── .env                     # Environment variables (excluded from Git)
+└── .env.example             # Template for environment setup
 
-```
+````
 
 ---
 
-## 🔐 Environment Variables
+## Setup Instructions
 
-Create a `.env` file in the `backend/` directory:
+### 1. Clone the Repository
 
+```bash
+git clone https://github.com/yourusername/ai-meeting-summary-backend.git
+cd ai-meeting-summary-backend/backend
+````
+
+### 2. Install Dependencies
+
+Using Yarn:
+
+```bash
+yarn
 ```
 
-OPENAI\_API\_KEY=your-openai-key
-PORT=5000
+Or with npm:
 
-```
-
-Refer to `.env.example` in the repo.
-
----
-
-## 🧩 Install & Run
-
-### 1. Install Dependencies
-
-```
-
+```bash
 npm install
-
 ```
 
-### 2. Start the Server
+### 3. Create `.env` File
 
+Create a `.env` file using the provided `.env.example`:
+
+```bash
+cp .env.example .env
 ```
 
-node app.js
+Edit `.env` and add your credentials:
 
 ```
+OPENAI_API_KEY=your-openai-api-key
+HUGGINGFACE_API_TOKEN=your-huggingface-api-token
+PORT=5000
+```
 
-The server will start at:  
-**http://localhost:5000**
+You can obtain keys from:
+
+* OpenAI: [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
+* Hugging Face: [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+
+### 4. Start the Server
+
+```bash
+yarn start
+```
+
+Or:
+
+```bash
+npm start
+```
+
+Server will run at:
+
+```
+http://localhost:5000
+```
 
 ---
 
-## 📤 API Endpoint
+## API Endpoint
 
-### POST `/api/process`
+### `POST /api/process`
 
-Accepts a `.txt` file and returns a JSON summary of the meeting.
+Uploads a `.txt` or audio file and returns a summarized version.
 
-#### Request  
-**Content-Type**: `multipart/form-data`  
-**Form Data**:  
-- `file`: uploaded `.txt` transcript
+**Request:**
 
-#### Sample Request (using `curl`)
+* Form Data:
+
+  * `file`: `.txt`, `.mp3`, `.wav`, or `.m4a`
+
+**Example using `curl`:**
+
+```bash
+curl -X POST http://localhost:5000/api/process \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@/path/to/meeting.mp3"
 ```
 
-curl -X POST [http://localhost:5000/api/process](http://localhost:5000/api/process)&#x20;
--F 'file=@transcript.txt'
+**Example Response (using Hugging Face):**
 
-```
-
-#### Response (Example)
-```
-
+```json
 {
-"summary": "The team discussed project goals and next steps.",
-"objections": \["Client is concerned about budget.", "Timeline may be too tight."],
-"resolutions": \["We offered payment plans.", "Flexible scheduling was proposed."],
-"action\_items": \["Send revised proposal", "Schedule follow-up meeting"]
+  "summary": "The team discussed Q3 deliverables and blockers.",
+  "objections": ["N/A (free model limitation)"],
+  "resolutions": ["N/A (free model limitation)"],
+  "action_items": ["N/A (free model limitation)"]
 }
-
 ```
 
 ---
 
-## 🧠 Prompt Template
+## Testing Locally
 
-> You are an assistant summarizing a business meeting. Based on the transcript, extract:  
-> - Summary  
-> - Objections raised  
-> - Resolutions or team responses  
-> - Action Items  
-> Return in structured JSON format.
+You can use tools like:
 
----
-
-## ✅ Health Check Route (Optional)
-
-You can hit `/api/ping` for a simple test:
-
-```
-
-GET /api/ping
-→ { "message": "Backend is alive 🧠" }
-
-```
+* Postman
+* curl
+* Your React frontend UI (connected to this backend)
 
 ---
 
-## 🛠️ Next Features (To-Do)
+## License
 
-| Feature                        | Status  |
-|-------------------------------|---------|
-| Audio transcription via Whisper API | ⬜ Planned |
-| Export summary as CSV/JSON     | ✅ (frontend handles) |
-| Email the summary via Nodemailer | ⬜ Planned |
-| CRM integration (e.g., HubSpot) | ⬜ Optional |
-| Token limits & error handling  | ⬜ Optional |
-
----
-
-## 📄 License
-
-MIT © 2025 Adwitiya Khare  
-Feel free to use, fork, and contribute!
-
----
-
-## 🤝 Contributions
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
----
-
-## 📬 Contact
-
-Created by **Adwitiya Khare**  
-📧 adwitiyakhare222004@gmail.com  
-🔗 [LinkedIn](https://linkedin.com) | [GitHub](https://github.com)
-```
+MIT
 
 ---
